@@ -6,10 +6,10 @@
 //  Copyright © 2020 Furong Ye. All rights reserved.
 //
 
-#include "instance/ea.cpp"
-#include "instance/RLS.cpp"
-#include "instance/fastGA.cpp"
-#include "instance/oneLLEA.cpp"
+#include "instance/ea.h"
+#include "instance/RLS.h"
+#include "instance/fastGA.h"
+#include "instance/oneLLEA.h"
 #include <vector>
 
 using namespace std;
@@ -18,16 +18,22 @@ int main(int argc, const char * argv[]) {
     vector<int> problem_id = {1,2};
     vector<int> instance_id = {1};
    vector<int> dimension = {100};
-   shared_ptr<IOHprofiler_suite<int> > pbo(new PBO_suite(problem_id,instance_id,dimension));
+   
   
-//  staticEA EA(1,1);
-//  EA.run("/Users/fye/Codes/Git/ConfigurableGA/ConfigurableGA/", "EA", pbo, 10000, 10000, 10,1);
+  staticEA EA(1,1);
+  shared_ptr<IOHprofiler_suite<int> > pbo_EA(new PBO_suite(problem_id,instance_id,dimension));
+  EA.run("./", "EA", pbo_EA, 10000, 10000, 10,1);
 //
-//  RLS rls_(1,1);
-//  rls_.run("/Users/fye/Codes/Git/ConfigurableGA/ConfigurableGA/", "RLS", pbo, 10000, 10000, 10,1);
+//  RLS rls_;
+//  shared_ptr<IOHprofiler_suite<int> > pbo_RLS(new PBO_suite(problem_id,instance_id,dimension));
+//  rls_.run("./", "RLS", pbo_RLS, 10000, 10000, 10,1);
+
 //
 //  fastGA fga(1,1);
-//  fga.run("/Users/fye/Codes/Git/ConfigurableGA/ConfigurableGA/", "fastGA", pbo, 10000, 10000, 100,1);
-  oneLambdaLambdaEA ollEA(1);
-  ollEA.run("/Users/fye/Codes/Git/ConfigurableGA/ConfigurableGA/", "(1+lambda,lambda) EA", pbo, 10000, 10000, 100,1);
+//  shared_ptr<IOHprofiler_suite<int> > pbo_fga(new PBO_suite(problem_id,instance_id,dimension));
+//  fga.run("./", "fastGA", pbo_fga, 10000, 10000, 100,1);
+
+//  oneLambdaLambdaEA ollEA(1);
+//  shared_ptr<IOHprofiler_suite<int> > pbo_ollEA(new PBO_suite(problem_id,instance_id,dimension));
+//  ollEA.run("./", "ollEA", pbo_ollEA, 10000, 10000, 100,1);
 }
