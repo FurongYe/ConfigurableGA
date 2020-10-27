@@ -23,6 +23,7 @@ public:
     this->SetSeed(rand_seed);
     
     this->run_N(suite);
+    logger->clear_logger();
   }
   
   double a = pow(1.5,0.25); /// < parameter for adjusting lambda

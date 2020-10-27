@@ -25,5 +25,6 @@ public:
     this->SetSeed(rand_seed);
     
     this->run_N(suite);
+    logger->clear_logger();
   }
 };

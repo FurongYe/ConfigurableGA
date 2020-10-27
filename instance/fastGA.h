@@ -1,20 +1,20 @@
 #include "geneticAlgorithm.h"
 
-class RLS : public GeneticAlgorithm {
+class fastGA : public GeneticAlgorithm {
   
 public:
-  RLS() {
-    this->set_mu(1);
-    this->set_lambda(1);
+  fastGA(int mu, int lambda) {
+    this->set_mu(mu);
+    this->set_lambda(lambda);
     this->set_crossover_mutation_r("IND");
     this->set_crossover_probability(0);
-    this->set_mutation_operator("STATICSAMPLE");
-    this->set_l(1);
+    this->set_mutation_operator("POWERLAWSAMPLE");
+    this->set_beta_f(1.5);
     this->set_selection_operator("BESTPLUS");
   }
   
   void run(string folder_path, string folder_name, shared_ptr<IOHprofiler_suite<int> > suite, int eval_budget, int gene_budget, int independent_runs, unsigned rand_seed){
-    string algorithm_name = "RLS";
+    string algorithm_name = "(" + to_string(this->get_mu()) + "+" + to_string(this->get_lambda()) + ") fast GA";
     std::shared_ptr<IOHprofiler_csv_logger<int>> logger(new IOHprofiler_csv_logger<int>(folder_path,folder_name,algorithm_name,algorithm_name) );
     logger->activate_logger();
     this->AssignLogger(logger);
@@ -26,5 +26,6 @@ public:
     this->SetSeed(rand_seed);
     
     this->run_N(suite);
+    logger->clear_logger();
   }
 };
