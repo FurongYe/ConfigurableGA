@@ -3,7 +3,7 @@
 
 This project provides a configurable framework of genetic algorithms.
 
-[Cmake](https://cmake.org) is used to build this project, and [__IOHexperimenter__](https://github.com/IOHprofiler/IOHexperimenter)  package is required.
+[Cmake](https://cmake.org) is used to build this project, and source code of [IOH](/IOH/src/) refers to the [__IOHexperimenter__](https://github.com/IOHprofiler/IOHexperimenter)  project.
 [src](/src/) contains source codes of the project, and [instance](/instances/) contains some examples of algorithm implementation.
 
 If you are using the tool for the first time, please download or clone this branch, and run `cmake .`; `make` at the directory where the project locates.
