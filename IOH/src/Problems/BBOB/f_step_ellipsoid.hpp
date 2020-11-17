@@ -11,6 +11,7 @@
 
 #include "IOHprofiler_problem.h"
 #include "coco_transformation.hpp"
+#include <math.h>
 
 class Step_Ellipsoid : public IOHprofiler_problem<double> {
 public:
@@ -78,7 +79,7 @@ public:
     }
     x1 = datax[0];
     
-    for (i = 0; i < n; ++i) {
+    for (i = 0; i <n; ++i) {
       if (fabs(datax[i]) > 0.5) /* TODO: Documentation: no fabs() in documentation */
         datax[i] = (double)floor(datax[i] + 0.5);
       else

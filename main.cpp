@@ -20,9 +20,9 @@ int main(int argc, const char * argv[]) {
    vector<int> dimension = {100};
    
   
-  staticEA EA(1,1);
+  staticEA EA(2,2);
   shared_ptr<IOHprofiler_suite<int> > pbo_EA(new PBO_suite(problem_id,instance_id,dimension));
-  EA.run("./", "EA", pbo_EA, 10000, 10000, 10,1);
+  EA.run("/tmp/", "EA", pbo_EA, 10000, 10000, 10,1);
 //
 //  RLS rls_;
 //  shared_ptr<IOHprofiler_suite<int> > pbo_RLS(new PBO_suite(problem_id,instance_id,dimension));
