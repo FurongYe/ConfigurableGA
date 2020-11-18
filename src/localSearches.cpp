@@ -1,7 +1,7 @@
 #include "localSearches.h"
 #include <iostream>
 
-inline static void simple_ea1p1(shared_ptr< IOHprofiler_problem<int> > problem, shared_ptr< IOHprofiler_csv_logger<int> > logger,
+void simple_ea1p1(shared_ptr< IOHprofiler_problem<int> > problem, shared_ptr< IOHprofiler_csv_logger<int> > logger,
 		int eval_budget) {
   int n = problem->IOHprofiler_get_number_of_variables();
   std::vector<int> xcur;
@@ -26,7 +26,7 @@ inline static void simple_ea1p1(shared_ptr< IOHprofiler_problem<int> > problem, 
     	for(int i = n; (--i)>=0;){
     		if(uniform_random()>=0.5) {
     			unchanged = false;
-    			xnew[i] ^= true;
+    			xnew[i] ^= 1;
     		}
     	}
     } while(unchanged);
