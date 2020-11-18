@@ -10,6 +10,7 @@
 #include "instance/RLS.h"
 #include "instance/fastGA.h"
 #include "instance/oneLLEA.h"
+#include "src/localSearches.h"
 #include <vector>
 
 using namespace std;
@@ -19,21 +20,14 @@ int main(int argc, const char * argv[]) {
     vector<int> instance_id = {1};
    vector<int> dimension = {100};
    
+   string dir = "/tmp/experiment";
   
-  staticEA EA(2,2);
-  shared_ptr<IOHprofiler_suite<int> > pbo_EA(new PBO_suite(problem_id,instance_id,dimension));
-  EA.run("/tmp/", "EA", pbo_EA, 10000, 10000, 10,1);
-//
-//  RLS rls_;
-//  shared_ptr<IOHprofiler_suite<int> > pbo_RLS(new PBO_suite(problem_id,instance_id,dimension));
-//  rls_.run("./", "RLS", pbo_RLS, 10000, 10000, 10,1);
+// If the following three lines are commented in, then the logger used in run_simple_ea1p1 goes into an endless (or at least very long) loop in function IOHprofiler_observer<T>::time_points_trigger
+//  staticEA EA(2,2);
+//  shared_ptr<IOHprofiler_suite<int> > pbo_EA(new PBO_suite(problem_id,instance_id,dimension));
+//  EA.run(dir, "EA", pbo_EA, 10000, 10000, 10,1);
 
-//
-//  fastGA fga(1,1);
-//  shared_ptr<IOHprofiler_suite<int> > pbo_fga(new PBO_suite(problem_id,instance_id,dimension));
-//  fga.run("./", "fastGA", pbo_fga, 10000, 10000, 100,1);
+  shared_ptr<IOHprofiler_suite<int> > pbo_simple_ea1p1(new PBO_suite(problem_id,instance_id,dimension));
+  run_simple_ea1p1(dir, pbo_simple_ea1p1, 10000, 10, 1);
 
-//  oneLambdaLambdaEA ollEA(1);
-//  shared_ptr<IOHprofiler_suite<int> > pbo_ollEA(new PBO_suite(problem_id,instance_id,dimension));
-//  ollEA.run("./", "ollEA", pbo_ollEA, 10000, 10000, 100,1);
 }

@@ -39,9 +39,7 @@
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
 			<storageModule buildDir="build/${ConfigName}" moduleId="de.marw.cdt.cmake.core.settings">
-				<options/>
-				<defs/>
-				<undefs/>
+				<options clearCache="true"/>
 				<linux command="cmake" generator="UnixMakefiles" use-default="true">
 					<defs/>
 					<undefs/>
