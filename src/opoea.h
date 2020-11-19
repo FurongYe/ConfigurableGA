@@ -20,7 +20,8 @@
 #include "common.h"
 
 void run_ea1p1(const string folder_path,
-    shared_ptr<IOHprofiler_suite<int> > suite, const int eval_budget,
-    const int independent_runs, const unsigned rand_seed);
-
+    shared_ptr<IOHprofiler_suite<int>> suite,
+    const unsigned long long eval_budget,
+    const unsigned long long independent_runs,
+    const unsigned long long rand_seed);
 #endif

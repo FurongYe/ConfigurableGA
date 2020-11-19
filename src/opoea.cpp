@@ -16,13 +16,20 @@
  */
 #include "opoea.h"
 
-void ea1p1(shared_ptr<IOHprofiler_problem<int> > problem,
-    shared_ptr<IOHprofiler_csv_logger<int> > logger, const int eval_budget) {
+void ea1p1(shared_ptr<IOHprofiler_problem<int>> problem,
+    shared_ptr<IOHprofiler_csv_logger<int>> logger,
+    const unsigned long long eval_budget) {
+// check input variables
+  if (eval_budget <= 1) throw "eval_budget must be > 1";
+  if (!problem) throw "problem must not be null";
+  if (!logger) throw "logger must not be null";
+
 // n be the number of variables
   const int n = problem->IOHprofiler_get_number_of_variables();
-  if(n <= 0) throw "number of variables must be positive";
+  if (n <= 0) throw "number of variables must be positive";
 // the bit flip probability
-  const double p = 1.0 / ((double)n);
+  const double p = 1.0 / ((double) n);
+  if ((!isfinite(p)) || (p <= 0.0) || (p >= 1.0)) throw "p must be from (0,1)";
 
 // xcur is the current best candidate solution (based on frequency fitness)
   std::vector<int> xcur;
@@ -44,7 +51,8 @@ void ea1p1(shared_ptr<IOHprofiler_problem<int> > problem,
 
 // we perform iterations until either the optimum is discovered or the budget has been exhausted
   int count = eval_budget;
-  while (((--count) > 0) && (!problem->IOHprofiler_hit_optimal())) {
+  unsigned long long int step = 1;
+  while (((++step) <= eval_budget) && (!problem->IOHprofiler_hit_optimal())) {
 
 // copy the current solution to the new solution
     xnew = xcur;
@@ -72,10 +80,17 @@ void ea1p1(shared_ptr<IOHprofiler_problem<int> > problem,
   }
 }
 
-// run the ea
+// run the (1+1) ea
 void run_ea1p1(const string folder_path,
-    shared_ptr<IOHprofiler_suite<int> > suite, const int eval_budget,
-    const int independent_runs, const unsigned rand_seed) {
+    shared_ptr<IOHprofiler_suite<int>> suite,
+    const unsigned long long eval_budget,
+    const unsigned long long independent_runs,
+    const unsigned long long rand_seed) {
+  if (folder_path.empty()) throw "folder path cannot be empty";
+  if (!suite) throw "suite cannot be null";
+  if (eval_budget <= 1) throw "eval_budget must be > 1";
+  if (independent_runs < 1) throw "independent_runs must be > 0";
+
   const string algorithm_name = "opoea";
   std::shared_ptr<IOHprofiler_csv_logger<int>> logger(
       new IOHprofiler_csv_logger<int>(folder_path, algorithm_name,
@@ -85,7 +100,7 @@ void run_ea1p1(const string folder_path,
   random_gen.seed(rand_seed);
   shared_ptr<IOHprofiler_problem<int> > problem;
   while ((problem = suite->get_next_problem()) != nullptr) {
-    for (int i = independent_runs; (--i) >= 0;) {
+    for (unsigned long long i = 0; i < independent_runs; i++) {
       problem->reset_problem();
       logger->track_problem(*problem);
       ea1p1(problem, logger, eval_budget);
