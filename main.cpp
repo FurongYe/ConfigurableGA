@@ -10,22 +10,29 @@
 #include "instance/RLS.h"
 #include "instance/fastGA.h"
 #include "instance/oneLLEA.h"
-#include "src/localSearches.h"
 #include <vector>
+#include "src/opoea.h"
+#include "src/opofea.h"
 
 using namespace std;
 
 int main(int argc, const char *argv[]) {
-	vector<int> problem_id = { 1, 2 };
-	vector<int> instance_id = { 1 };
-	vector<int> dimension = { 100 };
+  const vector<int> problem_id = { 1, 2, 10, 18, 20, 21, 22, 23 };
+  const vector<int> instance_id = { 1 };
+  const vector<int> dimension = { 100 };
+  const string dir = "/tmp/experiment";
+  const int budget = 100000;
+  const int runs = 10;
+  const unsigned seed = 1;
 
-	string dir = "/tmp/experiment";
+//	staticEA EA(2, 2);
+//	shared_ptr<IOHprofiler_suite<int> > pbo_EA(new PBO_suite(problem_id, instance_id, dimension));
+//	EA.run(dir, "EA", pbo_EA, budget, budget, runs, seed);
 
-	staticEA EA(2, 2);
-	shared_ptr<IOHprofiler_suite<int> > pbo_EA(new PBO_suite(problem_id, instance_id, dimension));
-	EA.run(dir, "EA", pbo_EA, 10000, 10000, 10, 1);
+  shared_ptr<IOHprofiler_suite<int> > pbo_ea1p1(
+      new PBO_suite(problem_id, instance_id, dimension));
+  run_ea1p1(dir, pbo_ea1p1, budget, runs, seed);
 
-	shared_ptr<IOHprofiler_suite<int> > pbo_simple_ea1p1(new PBO_suite(problem_id, instance_id, dimension));
-	run_simple_ea1p1(dir, pbo_simple_ea1p1, 10000, 10, 1);
+//	shared_ptr<IOHprofiler_suite<int> > pbo_fea1p1(new PBO_suite(problem_id, instance_id, dimension));
+//	run_fea1p1(dir, pbo_fea1p1, budget, runs, seed);
 }
