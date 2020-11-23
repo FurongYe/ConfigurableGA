@@ -11,29 +11,35 @@
 #include "instance/fastGA.h"
 #include "instance/oneLLEA.h"
 #include <vector>
+#include "src/opoea.h"
+#include "src/opofea.h"
+#include "src/sa.h"
 
 using namespace std;
 
-int main(int argc, const char * argv[]) {
-    vector<int> problem_id = {1,2};
-    vector<int> instance_id = {1};
-   vector<int> dimension = {100};
-   
-  
-  staticEA EA(1,1);
-  shared_ptr<IOHprofiler_suite<int> > pbo_EA(new PBO_suite(problem_id,instance_id,dimension));
-  EA.run("./", "EA", pbo_EA, 10000, 10000, 10,1);
-//
-//  RLS rls_;
-//  shared_ptr<IOHprofiler_suite<int> > pbo_RLS(new PBO_suite(problem_id,instance_id,dimension));
-//  rls_.run("./", "RLS", pbo_RLS, 10000, 10000, 10,1);
+int main(int argc, const char *argv[]) {
+  const vector<int> problem_id = { 1, 2, 10, 18, 20, 21, 22, 23 };
+  const vector<int> instance_id = { 1 };
+  const vector<int> dimension = { 100 };
+  const string dir = "/tmp/experiment";
+  const int budget = 100000;
+  const int runs = 10;
+  const unsigned seed = 1;
 
-//
-//  fastGA fga(1,1);
-//  shared_ptr<IOHprofiler_suite<int> > pbo_fga(new PBO_suite(problem_id,instance_id,dimension));
-//  fga.run("./", "fastGA", pbo_fga, 10000, 10000, 100,1);
+  staticEA EA(1, 1); // for comparison with opoea
+  shared_ptr<IOHprofiler_suite<int> > pbo_EA(
+      new PBO_suite(problem_id, instance_id, dimension));
+  EA.run(dir, "EA", pbo_EA, budget, budget, runs, seed);
 
-//  oneLambdaLambdaEA ollEA(1);
-//  shared_ptr<IOHprofiler_suite<int> > pbo_ollEA(new PBO_suite(problem_id,instance_id,dimension));
-//  ollEA.run("./", "ollEA", pbo_ollEA, 10000, 10000, 100,1);
+  shared_ptr<IOHprofiler_suite<int> > pbo_ea1p1(
+      new PBO_suite(problem_id, instance_id, dimension));
+  run_ea1p1(dir, pbo_ea1p1, budget, runs, seed);
+
+  shared_ptr<IOHprofiler_suite<int> > pbo_fea1p1(
+      new PBO_suite(problem_id, instance_id, dimension));
+  run_fea1p1(dir, pbo_fea1p1, budget, runs, seed);
+
+  shared_ptr<IOHprofiler_suite<int>> pbo_sa(
+      new PBO_suite(problem_id, instance_id, dimension));
+  run_simulated_annealing_exp(dir, pbo_sa, budget, runs, seed);
 }
