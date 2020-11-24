@@ -42,7 +42,7 @@ void ea1p1(shared_ptr<IOHprofiler_problem<int>> problem,
 
 // first we generate the random initial solution
   xcur.reserve(n);
-  for (int i = n; (--i) >= 0;) {
+  for (int i = 0; i < n; i++) {
     xcur.push_back((int) (2 * uniform_random()));
   }
 // we evaluate the random initial solution
