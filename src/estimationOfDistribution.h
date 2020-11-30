@@ -11,14 +11,11 @@
 
 #include "common.h"
 
-#define DEFAULT_MU_ 1
-#define DEFAULT_LAMBDA_ 1
-
-class EstimationOfDistribution : {
+class EstimationOfDistribution {
 public:
-  EstimationOfDistribution() :
-  mu_(DEFAULT_MU_),
-  lambda_(DEFAULT_LAMBDA_) {}
+  EstimationOfDistribution(int mu = 25, int lambda = 50) :
+  mu_(mu),
+  lambda_(lambda) {}
   
   ~EstimationOfDistribution() {}
   EstimationOfDistribution(const EstimationOfDistribution&) = delete;
@@ -34,11 +31,11 @@ public:
   /// \brief Do function of the algorithm.
   ///
   /// The order of processing functions is: Initialization() ->
-  /// Loop{ EstimationDistribution() -> SamplingIndividuals() -> Selection()} -> ~Termination().
+  /// Loop{SampleIndividuals() -> Selection()-> EstimationDistribution()} -> ~Termination().
   /// The function is virtual, which allows users to implement their own algorithm.
   virtual void DoEstimationOfDistribution();
   
-  void Initialization();
+  virtual void Initialization();
   
   void Preparation();
   
@@ -46,11 +43,15 @@ public:
   
   void EstimateVariablesDistribution();
 
+  void SampleIndividual(const vector< vector <double> > &distributions, vector <int> &individual);
+
   void SetSeed(unsigned seed);
   
   void AssignProblem(shared_ptr<IOHprofiler_problem<int> > problem_ptr);
   
   void AssignLogger(shared_ptr<IOHprofiler_csv_logger<int> > logger_ptr);
+
+  virtual void Selection();
   
   void set_mu(const int mu);
   void set_lambda(const int lambda);
@@ -96,8 +97,9 @@ public:
   
   /// \fn run()
   /// \brief Run the algorithm once with given parameters.
-  void run();
-  
+  void run(string folder_path, string folder_name, shared_ptr<IOHprofiler_suite<int> > suite, int eval_budget, int gene_budget, int independent_runs, unsigned rand_seed);
+  void run(shared_ptr<IOHprofiler_suite<int> > suite);
+
 private:
   int mu_; /// < parents population size
   int lambda_; /// < offspring population size
