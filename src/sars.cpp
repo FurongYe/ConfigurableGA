@@ -1,6 +1,6 @@
 /**
  * Here we implement the Simulated Annealing algorithm with
- * exponential temperature schedule.
+ * exponential temperature schedule with iterative restarts.
  *
  * The problem with simulated annealing is that it has several
  * parameters that need to be configured well in order for it
@@ -14,9 +14,17 @@
  * black-box settings where absolutely nothing is known
  * about the objective function.
  *
- * Still, to be able to do some experiments, we propose the
- * following automatic setup based on the number 'n' of
- * variables of the problem:
+ * The dependency on the budget is reduced here by performing
+ * internal restarts. The first restart has a budget of 1024
+ * FEs, the second one of 2048 FEs, and so on: the "inner"
+ * runs always double in budget. Thus, the advantages of SA
+ * can be obtained faster by wasting about half of the
+ * computational budget.
+ *
+ * Still, to be able to do some experiments, we need to also
+ * configure the temperatures. We propose the following
+ * automatic setup based on the number 'n' of variables of
+ * the problem and the budgets of the single internal runs:
  *
  * - the temperature schedule is exponential
  * - the start temperature is such that it time 1 the
@@ -44,7 +52,7 @@
  *         Hefei, Anhui, China
  * Email: tweise@hfuu.edu.cn, tweise@ustc.edu.cn
  */
-#include "sa.h"
+#include "sars.h"
 #include <math.h>
 
 // Compute the acceptance probability from DeltaE and the temperature
@@ -83,7 +91,7 @@ inline static double epsilon_from_T_and_step(const double Tstart,
   return epsilon;
 }
 
-void simulated_annealing_exp(shared_ptr<IOHprofiler_problem<int>> problem,
+void simulated_annealing_exp_rs(shared_ptr<IOHprofiler_problem<int>> problem,
     shared_ptr<IOHprofiler_csv_logger<int>> logger,
     const unsigned long long eval_budget) {
 // check input variables
@@ -98,30 +106,13 @@ void simulated_annealing_exp(shared_ptr<IOHprofiler_problem<int>> problem,
   const double p = 1.0 / ((double) n);
   if ((!isfinite(p)) || (p <= 0.0) || (p >= 1.0)) throw "p must be from (0,1)";
 
-// perform the auto-configuration
-  const double Tstart = T_from_DeltaE_and_P(max(1.0, n / 4.0), 0.1);
-  if ((!isfinite(Tstart)) || (Tstart < 1)) throw "Tstart must be >= 1";
-  const double Tend = T_from_DeltaE_and_P(1.0, 1.0 / sqrt(eval_budget));
-  if ((!isfinite(Tend)) || (Tend >= Tstart)) throw "Tend must be < Tstart";
-  const double epsilon = epsilon_from_T_and_step(Tstart, Tend, eval_budget);
-  if ((!isfinite(epsilon)) || (epsilon <= 0) || (epsilon >= 1))
-    throw "epsilon must be in (0,1)";
-
-// store all the parameters
-  std::vector<std::shared_ptr<double> > parameters;
-  parameters.push_back(std::make_shared<double>(Tstart));
-  parameters.push_back(std::make_shared<double>(Tend));
-  parameters.push_back(std::make_shared<double>(epsilon));
-  parameters.push_back(std::make_shared<double>(p));
-  std::vector<std::string> parameter_names;
-  parameter_names.push_back("Tstart");
-  parameter_names.push_back("Tend");
-  parameter_names.push_back("epsilon");
-  parameter_names.push_back("p");
-  logger->set_parameters(parameters, parameter_names);
-
 // xcur is the current best candidate solution (based on frequency fitness)
   std::vector<int> xcur;
+  xcur.reserve(n);
+  for(int i = n; (--i) >= 0; ) {
+    xcur.push_back(0);
+  }
+
 // xnew is the new candidate solution generated in each step
   std::vector<int> xnew;
 // ycur is the objective value of the current solution
@@ -129,50 +120,93 @@ void simulated_annealing_exp(shared_ptr<IOHprofiler_problem<int>> problem,
 // ynew is the objective value of the new solution
   double ynew = std::numeric_limits<double>::infinity();
 
+  const double Tstart = T_from_DeltaE_and_P(max(1.0, n / 4.0), 0.1);
+  if ((!isfinite(Tstart)) || (Tstart < 1)) throw "Tstart must be >= 1";
+
+  std::shared_ptr<double> Tend = std::make_shared<double>(0);
+  std::shared_ptr<double> epsilon = std::make_shared<double>(0);
+  std::shared_ptr<double> innerBudgetParam = std::make_shared<double>(0);
+
+  // store all the parameters
+  std::vector<std::shared_ptr<double> > parameters;
+  parameters.push_back(std::make_shared<double>(Tstart));
+  parameters.push_back(Tend);
+  parameters.push_back(epsilon);
+  parameters.push_back(innerBudgetParam);
+  parameters.push_back(std::make_shared<double>(p));
+  std::vector<std::string> parameter_names;
+  parameter_names.push_back("Tstart");
+  parameter_names.push_back("Tend");
+  parameter_names.push_back("epsilon");
+  parameter_names.push_back("innerBudget");
+  parameter_names.push_back("p");
+  logger->set_parameters(parameters, parameter_names);
+
+  unsigned long long int innerBudget = 512;
+  unsigned long long int stepMain = 1;
+
+// the main loop containing the inner, independent runs
+  while (((++stepMain) <= eval_budget) && (!problem->IOHprofiler_hit_optimal())) {
+// set the budget for the next inner run
+    innerBudget += innerBudget;
+    *innerBudgetParam = (double)innerBudget;
+    ++stepMain;
+
+// perform the auto-configuration for the inner runs
+    *Tend = T_from_DeltaE_and_P(1.0, 1.0 / sqrt(innerBudget));
+    if ((!isfinite(*Tend)) || (*Tend >= Tstart)) throw "Tend must be < Tstart";
+    *epsilon = epsilon_from_T_and_step(Tstart, *Tend, innerBudget);
+    if ((!isfinite(*epsilon)) || (*epsilon <= 0) || (*epsilon >= 1))
+      throw "epsilon must be in (0,1)";
+
+    ycur = std::numeric_limits<double>::infinity();
+    ynew = std::numeric_limits<double>::infinity();
+
 // first we generate the random initial solution
-  xcur.reserve(n);
-  for (int i = 0; i < n; i++) {
-    xcur.push_back((int) (2 * uniform_random()));
-  }
+    for (int i = 0; i < n; i++) {
+      xcur[i] = (int) (2 * uniform_random());
+    }
 // we evaluate the random initial solution
-  ycur = problem->evaluate(xcur);
-  logger->do_log(problem->loggerInfo());
+    ycur = problem->evaluate(xcur);
+    logger->do_log(problem->loggerInfo());
 
 // we perform iterations until either the optimum is discovered or the budget has been exhausted
-  unsigned long long int step = 1;
-  while (((++step) <= eval_budget) && (!problem->IOHprofiler_hit_optimal())) {
+    unsigned long long int step = 1;
+    while (((++stepMain) <= eval_budget) && ((++step) <= innerBudget)
+        && (!problem->IOHprofiler_hit_optimal())) {
 
 // copy the current solution to the new solution
-    xnew = xcur;
-    bool unchanged = true;
+      xnew = xcur;
+      bool unchanged = true;
 // until the solution changes, repeat
-    do {
-      // flip each bit with the independent probability of 1/n
-      for (int i = n; (--i) >= 0;) {
-        if (uniform_random() < p) {
-          unchanged = false; // there was a change
-          xnew[i] ^= 1; // flip the bit
+      do {
+        // flip each bit with the independent probability of 1/n
+        for (int i = n; (--i) >= 0;) {
+          if (uniform_random() < p) {
+            unchanged = false; // there was a change
+            xnew[i] ^= 1; // flip the bit
+          }
         }
-      }
-    } while (unchanged); // repeat until at least one change
+      } while (unchanged); // repeat until at least one change
 
 // evaluate the new candidate solution
-    ynew = problem->evaluate(xnew);
-    logger->do_log(problem->loggerInfo());
+      ynew = problem->evaluate(xnew);
+      logger->do_log(problem->loggerInfo());
 
 // if new solution is at least as good as current one, accept it
 // otherwise: if check if it is acceptable at the current temperature
-    if ((ynew >= ycur)
-        || (uniform_random()
-            < p_accept(ycur - ynew, temperature(Tstart, epsilon, step)))) {
-      ycur = ynew;
-      xcur = xnew;
+      if ((ynew >= ycur)
+          || (uniform_random()
+              < p_accept(ycur - ynew, temperature(Tstart, *epsilon, step)))) {
+        ycur = ynew;
+        xcur = xnew;
+      }
     }
   }
 }
 
-// run the simulated annealing algorithm with automatic configuration
-void run_simulated_annealing_exp(const string folder_path,
+// run the simulated annealing algorithm with automatic configuration and restarts
+void run_simulated_annealing_exp_rs(const string folder_path,
     shared_ptr<IOHprofiler_suite<int>> suite,
     const unsigned long long eval_budget,
     const unsigned long long independent_runs,
@@ -182,7 +216,7 @@ void run_simulated_annealing_exp(const string folder_path,
   if (eval_budget <= 1) throw "eval_budget must be > 1";
   if (independent_runs < 1) throw "independent_runs must be > 0";
 
-  const string algorithm_name = "sa_auto";
+  const string algorithm_name = "sars_auto";
   std::shared_ptr<IOHprofiler_csv_logger<int>> logger(
       new IOHprofiler_csv_logger<int>(folder_path, algorithm_name,
           algorithm_name, algorithm_name));
@@ -194,7 +228,7 @@ void run_simulated_annealing_exp(const string folder_path,
     for (unsigned long long i = 0; i < independent_runs; i++) {
       problem->reset_problem();
       logger->track_problem(*problem);
-      simulated_annealing_exp(problem, logger, eval_budget);
+      simulated_annealing_exp_rs(problem, logger, eval_budget);
     }
   }
 

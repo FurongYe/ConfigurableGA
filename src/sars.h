@@ -1,6 +1,6 @@
 /**
  * Here we implement the Simulated Annealing algorithm with
- * exponential temperature schedule.
+ * exponential temperature schedule with iterative restarts.
  *
  * The problem with simulated annealing is that it has several
  * parameters that need to be configured well in order for it
@@ -14,9 +14,17 @@
  * black-box settings where absolutely nothing is known
  * about the objective function.
  *
- * Still, to be able to do some experiments, we propose the
- * following automatic setup based on the number 'n' of
- * variables of the problem:
+ * The dependency on the budget is reduced here by performing
+ * internal restarts. The first restart has a budget of 1024
+ * FEs, the second one of 2048 FEs, and so on: the "inner"
+ * runs always double in budget. Thus, the advantages of SA
+ * can be obtained faster by wasting about half of the
+ * computational budget.
+ *
+ * Still, to be able to do some experiments, we need to also
+ * configure the temperatures. We propose the following
+ * automatic setup based on the number 'n' of variables of
+ * the problem and the budgets of the single internal runs:
  *
  * - the temperature schedule is exponential
  * - the start temperature is such that it time 1 the
@@ -44,12 +52,11 @@
  *         Hefei, Anhui, China
  * Email: tweise@hfuu.edu.cn, tweise@ustc.edu.cn
  */
-
-#ifndef _SA_H_
-#define _SA_H_
+#ifndef _SARS_H_
+#define _SARS_H_
 #include "common.h"
 
-void run_simulated_annealing_exp(const string folder_path,
+void run_simulated_annealing_exp_rs(const string folder_path,
     shared_ptr<IOHprofiler_suite<int>> suite,
     const unsigned long long eval_budget,
     const unsigned long long independent_runs,

@@ -14,6 +14,7 @@
 #include "src/opoea.h"
 #include "src/opofea.h"
 #include "src/sa.h"
+#include "src/sars.h"
 
 using namespace std;
 
@@ -42,4 +43,8 @@ int main(int argc, const char *argv[]) {
   shared_ptr<IOHprofiler_suite<int>> pbo_sa(
       new PBO_suite(problem_id, instance_id, dimension));
   run_simulated_annealing_exp(dir, pbo_sa, budget, runs, seed);
+
+  shared_ptr<IOHprofiler_suite<int>> pbo_sars(
+      new PBO_suite(problem_id, instance_id, dimension));
+  run_simulated_annealing_exp_rs(dir, pbo_sars, budget, runs, seed);
 }
