@@ -1,34 +1,34 @@
-/// \file w_model_OneMax_suite.h
-/// \brief Hpp file for class w_model_OneMax_suite.
+/// \file w_model_LeadingOnes_suite.h
+/// \brief Hpp file for class w_model_LeadingOnes_suite.
 ///
-/// A suite for test w-model extensions of OneMax.
+/// A suite for test w-model extensions of LeadingOnes.
 ///
 /// \author Furong Ye
-/// \date 2019-12-05
+/// \date 2019-12-08
 
-#ifndef _W_MODEL_ONEMAX_SUITE_HPP
-#define _W_MODEL_ONEMAX_SUITE_HPP
+#ifndef _W_MODEL_LEADINGONEONES_SUITE_HPP
+#define _W_MODEL_LEADINGONEONES_SUITE_HPP
 
 #include <sstream>
 #include <iomanip>
 #include "f_one_max.hpp"
-#include "f_w_model_one_max.hpp"
+#include "f_w_model_leading_ones.hpp"
 #include "IOHprofiler_suite.h"
 
 using namespace std;
 
-vector<double> default_om_dummy = {0.0, 0.1, 0.25, 0.9};
-vector<int> default_om_epistasis = {0, 2, 3, 4, 5, 7};
-vector<int> default_om_neutrality = {1, 3, 5};
-vector<double> default_om_ruggedness = {0, 0.2, 0.4, 0.6, 0.8, 1};
+vector<double> default_lo_dummy = {0.0, 0.1, 0.25, 0.9};
+vector<int> default_lo_epistasis = {0, 2, 3, 4, 5, 7};
+vector<int> default_lo_neutrality = {1, 3, 5};
+vector<double> default_lo_ruggedness = {0, 0.2, 0.4, 0.6, 0.8, 1};
 
-class W_Model_OneMax_suite : public IOHprofiler_suite<int>
+class W_Model_LeadingOnes_suite : public IOHprofiler_suite<int>
 {
 public:
-  W_Model_OneMax_suite(vector<double> dummy_para = default_om_dummy,
-                       vector<int> epistasis_para = default_om_epistasis,
-                       vector<int> neturality_para = default_om_neutrality,
-                       vector<double> ruggedness_para = default_om_ruggedness)
+  W_Model_LeadingOnes_suite(vector<double> dummy_para = default_lo_dummy,
+                            vector<int> epistasis_para = default_lo_epistasis,
+                            vector<int> neturality_para = default_lo_neutrality,
+                            vector<double> ruggedness_para = default_lo_ruggedness)
       : dummy_para_(dummy_para),
         epistasis_para_(epistasis_para),
         neturality_para_(neturality_para),
@@ -60,15 +60,15 @@ public:
     IOHprofiler_set_suite_problem_id(problem_id);
     IOHprofiler_set_suite_instance_id(instance_id);
     IOHprofiler_set_suite_dimension(dimension);
-    IOHprofiler_set_suite_name("W_Model_OneMax_suite");
+    IOHprofiler_set_suite_name("W_Model_LeadingOnes_suite");
     this->loadProblem();
   }
 
-  W_Model_OneMax_suite(std::vector<int> problem_id, std::vector<int> instance_id, std::vector<int> dimension,
-                       vector<double> dummy_para = default_om_dummy,
-                       vector<int> epistasis_para = default_om_epistasis,
-                       vector<int> neturality_para = default_om_neutrality,
-                       vector<double> ruggedness_para = default_om_ruggedness)
+  W_Model_LeadingOnes_suite(std::vector<int> problem_id, std::vector<int> instance_id, std::vector<int> dimension,
+                            vector<double> dummy_para = default_lo_dummy,
+                            vector<int> epistasis_para = default_lo_epistasis,
+                            vector<int> neturality_para = default_lo_neutrality,
+                            vector<double> ruggedness_para = default_lo_ruggedness)
       : dummy_para_(dummy_para),
         epistasis_para_(epistasis_para),
         neturality_para_(neturality_para),
@@ -93,7 +93,7 @@ public:
     {
       if (problem_id[i] < 0 || problem_id[i] > this->para_product_.size())
       {
-        IOH_error("problem_id " + std::to_string(problem_id[i]) + " is not in W_Model_OneMax_suite");
+        IOH_error("problem_id " + std::to_string(problem_id[i]) + " is not in W_Model_LeadingOnes_suite");
       }
     }
 
@@ -101,7 +101,7 @@ public:
     {
       if (instance_id[i] < 0 || instance_id[i] > 100)
       {
-        IOH_error("instance_id " + std::to_string(instance_id[i]) + " is not in W_Model_OneMax_suite");
+        IOH_error("instance_id " + std::to_string(instance_id[i]) + " is not in W_Model_LeadingOnes_suite");
       }
     }
 
@@ -109,14 +109,14 @@ public:
     {
       if (dimension[i] < 0 || dimension[i] > 20000)
       {
-        IOH_error("dimension " + std::to_string(dimension[i]) + " is not in W_Model_OneMax_suite");
+        IOH_error("dimension " + std::to_string(dimension[i]) + " is not in W_Model_LeadingOnes_suite");
       }
     }
 
     IOHprofiler_set_suite_problem_id(problem_id);
     IOHprofiler_set_suite_instance_id(instance_id);
     IOHprofiler_set_suite_dimension(dimension);
-    IOHprofiler_set_suite_name("W_Model_OneMax_suite");
+    IOHprofiler_set_suite_name("W_Model_LeadingOnes_suite");
     this->loadProblem();
   }
 
@@ -134,14 +134,14 @@ public:
       for (int j = 0; j != this->IOHprofiler_suite_get_dimension().size(); ++j)
       {
 
-        shared_ptr<W_Model_OneMax> p(new W_Model_OneMax());
+        shared_ptr<W_Model_LeadingOnes> p(new W_Model_LeadingOnes());
         p->set_w_setting(this->dummy_para_[this->para_product_[i][0]],
                          this->epistasis_para_[this->para_product_[i][1]],
                          this->neturality_para_[this->para_product_[i][2]],
                          static_cast<int>(floor(this->IOHprofiler_suite_get_dimension()[j] * this->ruggedness_para_[this->para_product_[i][3]])));
 
         // Set the problem name.
-        string problem_name = "Onemax";
+        string problem_name = "LeadingOnes";
         std::stringstream dss;
         dss << std::setprecision(3) << this->dummy_para_[this->para_product_[i][0]];
         problem_name += "_D" + dss.str();
@@ -204,14 +204,14 @@ public:
     this->ruggedness_para_ = ruggedness_para;
   }
 
-  static W_Model_OneMax_suite *createInstance()
+  static W_Model_LeadingOnes_suite *createInstance()
   {
-    return new W_Model_OneMax_suite();
+    return new W_Model_LeadingOnes_suite();
   }
 
-  static W_Model_OneMax_suite *createInstance(std::vector<int> problem_id, std::vector<int> instance_id, std::vector<int> dimension)
+  static W_Model_LeadingOnes_suite *createInstance(std::vector<int> problem_id, std::vector<int> instance_id, std::vector<int> dimension)
   {
-    return new W_Model_OneMax_suite(problem_id, instance_id, dimension);
+    return new W_Model_LeadingOnes_suite(problem_id, instance_id, dimension);
   }
 
 private:
@@ -222,4 +222,4 @@ private:
   vector<vector<size_t>> para_product_;
 };
 
-#endif //_W_MODEL_ONEMAX_SUITE_HPP
+#endif //_W_MODEL_LEADINGONEONES_SUITE_HPP
