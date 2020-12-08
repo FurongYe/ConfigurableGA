@@ -1,10 +1,11 @@
-/// \file IOHprofiler_PBO_suite.h
-/// \brief Hpp file for class IOHprofiler_PBO_suite.
+/// \file w_model_OneMax_suite.h
+/// \brief Hpp file for class w_model_OneMax_suite.
 ///
-/// A suite of Pseudo Boolean problems (23 problems, 1-100 instances, and dimension <= 20000).
+/// A suite for test w-model extensions of OneMax.
 ///
 /// \author Furong Ye
-/// \date 2019-06-27
+/// \date 2019-12-05
+
 #ifndef _W_MODEL_ONEMAX_SUITE_HPP
 #define _W_MODEL_ONEMAX_SUITE_HPP
 
@@ -15,81 +16,69 @@
 #include "IOHprofiler_suite.h"
 
 using namespace std;
-vector< shared_ptr<W_Model_OneMax> > w_model_onemax_list;
 
 vector<double> default_dummy_para = {0.0, 0.1, 0.25, 0.9};
 vector<int> default_epistasis_para = {0, 2, 3, 4, 5, 7};
-vector<int> default_neturality_para = {1, 3, 5};
+vector<int> default_neutrality_para = {1, 3, 5};
 vector<double> default_ruggedness_para = {0, 0.2, 0.4, 0.6, 0.8, 1};
-
-size_t FE_budget = 100000;
-size_t independent_runs  = 11;
 
 class W_Model_OneMax_suite : public IOHprofiler_suite<int> {
 public:
-  using InputType = int;
-
   W_Model_OneMax_suite(vector<double>dummy_para = default_dummy_para,
                         vector <int> epistasis_para = default_epistasis_para, 
-                        vector <int> neturality_para = default_neturality_para, 
+                        vector <int> neturality_para = default_neutrality_para, 
                         vector<double> ruggedness_para = default_ruggedness_para)
-                        : dummy_para(dummy_para),
-                          epistasis_para(epistasis_para),
-                          neturality_para(neturality_para),
-                          ruggedness_para(ruggedness_para) {
+                        : dummy_para_(dummy_para),
+                          epistasis_para_(epistasis_para),
+                          neturality_para_(neturality_para),
+                          ruggedness_para_(ruggedness_para) {
     
-        for (size_t du = 0; du != this->dummy_para.size(); ++du) {
-      for (size_t ep = 0; ep != this->epistasis_para.size(); ++ ep) {
-        for (size_t ne = 0; ne != this->neturality_para.size(); ++ne) {
-          for (size_t ru = 0; ru != this->ruggedness_para.size(); ++ru) {
-            this->para_product.push_back({du,ep,ne,ru});
+    for (size_t du = 0; du != this->dummy_para_.size(); ++du) {
+      for (size_t ep = 0; ep != this->epistasis_para_.size(); ++ ep) {
+        for (size_t ne = 0; ne != this->neturality_para_.size(); ++ne) {
+          for (size_t ru = 0; ru != this->ruggedness_para_.size(); ++ru) {
+            this->para_product_.push_back({du,ep,ne,ru});
           }
         }
       }
     }
 
-    std::vector<int> problem_id;
-    std::vector<int> instance_id;
-    std::vector<int> dimension;
-    for (int i = 0; i < para_product.size(); ++i) {
+    vector<int> problem_id;
+    vector<int> instance_id = {1};
+    vector<int> dimension = {20,30};
+    for (int i = 0; i < para_product_.size(); ++i) {
       problem_id.push_back(i+1);
     }
-    for (int i = 0; i < 1; ++i) {
-      instance_id.push_back(i+1);
-    }
-    dimension.push_back(20);
-    dimension.push_back(30);
 
     IOHprofiler_set_suite_problem_id(problem_id);
     IOHprofiler_set_suite_instance_id(instance_id);
     IOHprofiler_set_suite_dimension(dimension);
     IOHprofiler_set_suite_name("W_Model_OneMax_suite");
-    // Load problem, so that the user don't have to think about it.
     this->loadProblem();
   }
 
   W_Model_OneMax_suite(std::vector<int> problem_id, std::vector<int> instance_id, std::vector<int> dimension, 
                         vector<double>dummy_para = default_dummy_para,
                         vector <int> epistasis_para = default_epistasis_para, 
-                        vector <int> neturality_para = default_neturality_para, 
+                        vector <int> neturality_para = default_neutrality_para, 
                         vector<double> ruggedness_para = default_ruggedness_para)
-                        : dummy_para(dummy_para),
-                          epistasis_para(epistasis_para),
-                          neturality_para(neturality_para),
-                          ruggedness_para(ruggedness_para) {
+                        : dummy_para_(dummy_para),
+                          epistasis_para_(epistasis_para),
+                          neturality_para_(neturality_para),
+                          ruggedness_para_(ruggedness_para) {
     
-    for (size_t du = 0; du != this->dummy_para.size(); ++du) {
-      for (size_t ep = 0; ep != this->epistasis_para.size(); ++ ep) {
-        for (size_t ne = 0; ne != this->neturality_para.size(); ++ne) {
-          for (size_t ru = 0; ru != this->ruggedness_para.size(); ++ru) {
-            this->para_product.push_back({du,ep,ne,ru});
+    for (size_t du = 0; du != this->dummy_para_.size(); ++du) {
+      for (size_t ep = 0; ep != this->epistasis_para_.size(); ++ ep) {
+        for (size_t ne = 0; ne != this->neturality_para_.size(); ++ne) {
+          for (size_t ru = 0; ru != this->ruggedness_para_.size(); ++ru) {
+            this->para_product_.push_back({du,ep,ne,ru});
           }
         }
       }
     }
     
     for (size_t i = 0; i < problem_id.size(); ++i) {
-      if (problem_id[i] < 0 || problem_id[i] > para_product.size()) {
+      if (problem_id[i] < 0 || problem_id[i] > this->para_product_.size()) {
         IOH_error("problem_id " + std::to_string(problem_id[i]) + " is not in W_Model_OneMax_suite");
       }
     }
@@ -118,24 +107,26 @@ public:
     if (this->size() != 0) {
       this->clear();
     }
-    this->IOHprofiler_set_size_of_problem_list(this->para_product.size() * this->IOHprofiler_suite_get_dimension().size());
-    this->IOHprofiler_set_problem_list_index(0);
+    this->IOHprofiler_set_size_of_problem_list(this->para_product_.size() * this->IOHprofiler_suite_get_dimension().size());
 
-    for (int i = 0; i != this->para_product.size(); ++i) {
+    for (int i = 0; i != this->para_product_.size(); ++i) {
       for (int j = 0; j != this->IOHprofiler_suite_get_dimension().size(); ++j) {
-        shared_ptr<W_Model_OneMax> p(new W_Model_OneMax());
-        p->set_w_setting(this->dummy_para[ this->para_product[i][0] ], this->epistasis_para[ this->para_product[i][1]], 
-                          this->neturality_para[ this->para_product[i][2] ],
-                          static_cast<int>( floor( this->IOHprofiler_suite_get_dimension()[j] * this->ruggedness_para[ this->para_product[i][3]] ) ) );
         
+        shared_ptr<W_Model_OneMax> p(new W_Model_OneMax());
+        p->set_w_setting(this->dummy_para_[ this->para_product_[i][0] ], 
+                          this->epistasis_para_[ this->para_product_[i][1]], 
+                          this->neturality_para_[ this->para_product_[i][2] ],
+                          static_cast<int>( floor( this->IOHprofiler_suite_get_dimension()[j] * this->ruggedness_para_[ this->para_product_[i][3]] ) ) );
+        
+        // Set the problem name.
         string problem_name = "Onemax";
         std::stringstream dss; 
-        dss << std::setprecision(3) << this->dummy_para[ this->para_product[i][0] ];
+        dss << std::setprecision(3) << this->dummy_para_[ this->para_product_[i][0] ];
         problem_name += "_D" + dss.str();
-        problem_name += "_E" + std::to_string(this->epistasis_para[ this->para_product[i][1] ]);
-        problem_name += "_N" + std::to_string(this->neturality_para[ this->para_product[i][2] ]);
+        problem_name += "_E" + std::to_string(this->epistasis_para_[ this->para_product_[i][1] ]);
+        problem_name += "_N" + std::to_string(this->neturality_para_[ this->para_product_[i][2] ]);
         std::stringstream rss;  
-        rss << std::setprecision(3) << this->ruggedness_para[ this->para_product[i][3] ];
+        rss << std::setprecision(3) << this->ruggedness_para_[ this->para_product_[i][3] ];
         problem_name += "_R" + rss.str();
         p->IOHprofiler_set_problem_name(problem_name);
         p->IOHprofiler_set_problem_id(i+1);
@@ -144,9 +135,43 @@ public:
         mapIDTOName(i+1, problem_name);
       }
     }
+
     assert(this->IOHprofiler_get_size_of_problem_list() == this->size());
     this->IOHprofiler_set_get_problem_flag(false);
+    this->IOHprofiler_set_problem_list_index(0);
     this->IOHprofiler_set_load_problem_flag(true);
+  }
+
+  vector<double> get_dummy_para() {
+    return this->dummy_para_;
+  }
+
+  vector<int> get_epistasis_para() {
+    return this->epistasis_para_;
+  }
+
+  vector<int> get_neturality_para() {
+    return this->neturality_para_;
+  }
+
+  vector<double> get_ruggedness_para() {
+    return this->ruggedness_para_;
+  }
+
+  void set_dummy_para(const vector<double> & dummy_para) {
+    this->dummy_para_ = dummy_para;
+  }
+  
+  void set_epistasis_para(const vector<int> & epistasis_para) {
+    this->epistasis_para_ = epistasis_para;
+  }
+
+  void set_neutrality_para(const vector<int> & neutrality_para) {
+    this->neturality_para_ = neutrality_para;
+  }
+  
+  void set_ruggedness_para(const vector<double> & ruggedness_para) {
+    this->ruggedness_para_ = ruggedness_para;
   }
 
   static W_Model_OneMax_suite * createInstance() {
@@ -158,11 +183,11 @@ public:
   }
 
 private:
-  vector<double> dummy_para;
-  vector<int> epistasis_para;
-  vector<int> neturality_para;
-  vector<double> ruggedness_para;
-  vector < vector <size_t> > para_product;
+  vector<double> dummy_para_;
+  vector<int> epistasis_para_;
+  vector<int> neturality_para_;
+  vector<double> ruggedness_para_;
+  vector < vector <size_t> > para_product_;
 };
 
 #endif //_W_MODEL_ONEMAX_SUITE_HPP
