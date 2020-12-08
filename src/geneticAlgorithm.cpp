@@ -1,7 +1,7 @@
 #include "geneticAlgorithm.h"
 
 bool GeneticAlgorithm::Termination() {
-  if (!this->optimum_found_flag_ && this->evaluation_ < this->evluation_budget_ && this->generation_ <= this->generation_budget_) {
+  if (!this->problem_->IOHprofiler_hit_optimal() && this->evaluation_ < this->evluation_budget_ && this->generation_ <= this->generation_budget_) {
     return false;
   } else {
     return true;
@@ -50,10 +50,6 @@ void GeneticAlgorithm::run_N(const vector<int> &integer_para, const vector<doubl
   this->ecdf_sum_ = 0;
   while (r < this->independent_runs_) {
     this->DoGeneticAlgorithm();
-//    if (this->ecdf_logger_ != nullptr) {
-//      IOHprofiler_ecdf_sum sum;
-//      this->ecdf_sum_ += sum(this->ecdf_logger_->data());
-//    }
     r++;
   }
   
@@ -74,10 +70,6 @@ void GeneticAlgorithm::run_N(shared_ptr<IOHprofiler_suite<int> > suite) {
     this->ecdf_sum_ = 0;
     while (r < this->independent_runs_) {
       this->DoGeneticAlgorithm();
-  //    if (this->ecdf_logger_ != nullptr) {
-  //      IOHprofiler_ecdf_sum sum;
-  //      this->ecdf_sum_ += sum(this->ecdf_logger_->data());
-  //    }
       r++;
     }
     
@@ -155,9 +147,7 @@ void GeneticAlgorithm::Preparation() {
 //    this->ecdf_logger_->track_problem(*this->problem_);
 //  }
   this->selected_parents_ = vector<size_t>(2);
-  this->optimum_found_flag_ = false;
   this->optimum_ = this->problem_->IOHprofiler_get_optimal()[0];
-  this->dimension_ = this->problem_->IOHprofiler_get_number_of_variables();
   this->PowerLawDistribution(this->problem_->IOHprofiler_get_number_of_variables());
   this->parents_fitness_.clear();
   this->parents_population_.clear();
@@ -197,11 +187,7 @@ double GeneticAlgorithm::Evaluate(vector<int> &x) {
   if (this->csv_logger_ != nullptr) {
     this->csv_logger_->do_log(this->problem_->loggerInfo()); /// TODO: we assume only using PBO suite now.
   }
-//  if (this->ecdf_logger_ != nullptr) {
-//    this->ecdf_logger_->do_log(this->problem_->loggerInfo()); /// TODO: we assume only using PBO suite now.
-//  }
   ++this->evaluation_;
-  this->optimum_found_flag_ = this->problem_->IOHprofiler_hit_optimal();
   
   if (Opt == optimizationType::MAXIMIZATION) {
     if (result > this->best_found_fitness_) {
@@ -369,7 +355,7 @@ int GeneticAlgorithm::get_lambda() const {
 }
 
 int GeneticAlgorithm::get_dimension() const {
-  return this->dimension_;
+  return this->problem_->IOHprofiler_get_number_of_variables();
 }
 
 double GeneticAlgorithm::get_crossover_probability() const {
@@ -380,203 +366,34 @@ int GeneticAlgorithm::get_crossover_mutation_r() const {
   return this->crossover_mutation_r_;
 }
 
-vector< vector<int> > GeneticAlgorithm::get_parents_population() {
+vector< vector<int> > GeneticAlgorithm::get_parents_population() const{
   return this->parents_population_;
 }
 
-vector<double> GeneticAlgorithm::get_parents_fitness() {
+vector<double> GeneticAlgorithm::get_parents_fitness() const{
   return this->parents_fitness_;
 }
 
-vector< vector<int> >  GeneticAlgorithm::get_offspring_population() {
+vector< vector<int> >  GeneticAlgorithm::get_offspring_population() const{
   return this->offspring_population_;
 }
 
-vector<double> GeneticAlgorithm::get_offspring_fitness() {
+vector<double> GeneticAlgorithm::get_offspring_fitness() const{
   return this->offspring_fitness_;
 }
 
-double GeneticAlgorithm::get_best_found_fitness() {
+double GeneticAlgorithm::get_best_found_fitness() const{
   return this->best_found_fitness_;
 }
 
-vector <int> GeneticAlgorithm::get_best_individual() {
+vector <int> GeneticAlgorithm::get_best_individual() const{
   return this->best_individual_;
 }
 
-size_t GeneticAlgorithm::get_generation() {
+size_t GeneticAlgorithm::get_generation() const{
   return this->generation_;
 }
 
-//double GeneticAlgorithm::EstimateLinearECDF(const vector<int> &integer_para, const vector<double> &continuous_para, const vector<string> &category_para, shared_ptr<IOHprofiler_suite<int> > suite, vector<double> targets) {
-//  assert(suite->IOHprofiler_suite_get_number_of_problems() == targets.size());
-//  
-//  if (integer_para[0] > integer_para[1] && category_para[3] == "BESTCOMMA") {
-//    clog << "mu > lambda with comma selection." << endl;
-//    return 0;
-//  }
-//  
-//  if (integer_para[3] >integer_para[1] && category_para[3] == "TOURNAMENTCOMMA") {
-//    clog << "tournament size is larger than lambda with comma selection." << endl;
-//    return 0;
-//  }
-//  
-//  if (integer_para[3] > integer_para[1] + integer_para[0] && category_para[3] == "TOURNAMENTPLUS" ) {
-//    clog << "tournament size is larger than mu + lambda with plus selection." << endl;
-//    return 0;
-//  }
-//  
-//  if (continuous_para[0] > 0 && integer_para[0] < 2) {
-//    clog << "doing crossover with population size less than 2" << endl;
-//    return 0;
-//  }
-//  
-//  this->ecdf_target_width_ = DEFAULT_ECDF_TARGET_LENGTH;
-//  this->ecdf_budget_width_ = this->evluation_budget_; /// TODO: Deciding to count every evaluation, or to count evaluations of default length
-//  
-//  using Logger = IOHprofiler_ecdf_logger<int>;
-//  
-//  int ti = 0;
-//  double result = 0;
-//  while ((this->problem_ = suite->get_next_problem()) != nullptr) {
-//    /// TODO: UPDATING this in general.
-//    IOHprofiler_RangeLinear<double> error(0,targets[ti],this->ecdf_target_width_);
-//    if(this->problem_->IOHprofiler_get_problem_id() == 22) {
-//      int d = this->problem_->IOHprofiler_get_number_of_variables();
-//      error = IOHprofiler_RangeLinear<double> (d - d * (d/2-1) * 4,targets[ti],this->ecdf_target_width_);
-//    } else if (this->problem_->IOHprofiler_get_problem_id() == 23) {
-//      int d = this->problem_->IOHprofiler_get_number_of_variables();
-//      error = IOHprofiler_RangeLinear<double> (5 * d * d - d * d* d * 4,targets[ti],this->ecdf_target_width_);
-//    } else if (this->problem_->IOHprofiler_get_problem_id() == 25) {
-//      int d = this->problem_->IOHprofiler_get_number_of_variables();
-//      error = IOHprofiler_RangeLinear<double> (-1,targets[ti],this->ecdf_target_width_);
-//    }
-//    IOHprofiler_RangeLinear<size_t> evals(0,this->evluation_budget_,this->ecdf_budget_width_);
-//    shared_ptr<Logger> logger(new Logger(error, evals) );
-//    this->ecdf_logger_ = logger;
-//    this->ecdf_logger_->activate_logger();
-//    this->ecdf_logger_->track_suite(*suite);
-//    this->run_N(integer_para,continuous_para,category_para);
-//    result += this->ecdf_ratio_;
-//    ++ti;
-//  }
-//  
-//  return result / (double) ti;
-//}
-//
-//double GeneticAlgorithm::EstimateLogECDF(const vector<int> &integer_para, const vector<double> &continuous_para, const vector<string> &category_para, shared_ptr<IOHprofiler_suite<int> > suite, vector<double> targets) {
-//  assert(suite->IOHprofiler_suite_get_number_of_problems() == targets.size());
-//  
-//  if (integer_para[0] > integer_para[1] && category_para[3] == "BESTCOMMA") {
-//    clog << "mu > lambda with comma selection." << endl;
-//    return 0;
-//  }
-//  
-//  if (integer_para[3] >integer_para[1] && category_para[3] == "TOURNAMENTCOMMA") {
-//    clog << "tournament size is larger than lambda with comma selection." << endl;
-//    return 0;
-//  }
-//  
-//  if (integer_para[3] > integer_para[1] + integer_para[0] && category_para[3] == "TOURNAMENTPLUS" ) {
-//    clog << "tournament size is larger than mu + lambda with plus selection." << endl;
-//    return 0;
-//  }
-//  
-//  if (continuous_para[0] > 0 && integer_para[0] < 2) {
-//    clog << "doing crossover with population size less than 2" << endl;
-//    return 0;
-//  }
-//  
-//  this->ecdf_target_width_ = DEFAULT_ECDF_TARGET_LENGTH;
-//  this->ecdf_budget_width_ = this->evluation_budget_; /// TODO: Deciding to count every evaluation, or to count evaluations of default length
-//  using Logger = IOHprofiler_ecdf_logger<int>;
-//  
-//  int ti = 0;
-//  double result = 0;
-//  while ((this->problem_ = suite->get_next_problem()) != nullptr) {
-//    IOHprofiler_RangeLog<double> error(0,targets[ti],this->ecdf_target_width_);
-//    IOHprofiler_RangeLog<size_t> evals(0,this->evluation_budget_,this->ecdf_budget_width_);
-//    if(this->problem_->IOHprofiler_get_problem_id() == 22) {
-//      int d = this->problem_->IOHprofiler_get_number_of_variables();
-//      error = IOHprofiler_RangeLog<double> (d - d * (d/2-1) * 4,targets[ti],this->ecdf_target_width_);
-//    } else if (this->problem_->IOHprofiler_get_problem_id() == 23) {
-//      int d = this->problem_->IOHprofiler_get_number_of_variables();
-//      error = IOHprofiler_RangeLog<double> (5 * d * d - d * d* d * 4,targets[ti],this->ecdf_target_width_);
-//    } else if (this->problem_->IOHprofiler_get_problem_id() == 25) {
-//      int d = this->problem_->IOHprofiler_get_number_of_variables();
-//      error = IOHprofiler_RangeLog<double> (-1,targets[ti],this->ecdf_target_width_);
-//    }
-//    shared_ptr<Logger> logger(new Logger(error, evals) );
-//    this->ecdf_logger_ = logger;
-//    this->ecdf_logger_->activate_logger();
-//    this->ecdf_logger_->track_suite(*suite);
-//    this->run_N(integer_para,continuous_para,category_para);
-//    result += this->ecdf_ratio_;
-//    ++ti;
-//  }
-//  return result / (double) ti;
-//}
-//
-//vector<double> GeneticAlgorithm::EstimateERT(const vector<int> &integer_para, const vector<double> &continuous_para, const vector<string> &category_para, shared_ptr<IOHprofiler_suite<int> > suite, const vector<double> &targets, const vector<size_t> &budgets) {
-//  assert(suite->IOHprofiler_suite_get_number_of_problems() == targets.size());
-//  assert(suite->IOHprofiler_suite_get_number_of_problems() == budgets.size());
-//  
-//  if (this->hitting_time_.size() != 0) {
-//    this->hitting_time_.clear();
-//  }
-//  
-//  this->ERT_flag_ = true;
-//  vector <double> ERTs;
-//  
-//  int ti = 0;
-//  while ((this->problem_ = suite->get_next_problem()) != nullptr) {
-//    if (integer_para[0] > integer_para[1] && category_para[3] == "BESTCOMMA") {
-//      ERTs.push_back(this->budgets[ti] * this->independent_runs_ * (100 + normal_random())); /// TODO: Deciding to return inf for infeasible cases, or to return penaltt values.
-//      clog << "mu > lambda with comma selection." << endl;
-//      continue;
-//    }
-//    
-//    if (integer_para[3] >integer_para[1] && category_para[3] == "TOURNAMENTCOMMA") {
-//      ERTs.push_back(this->budgets[ti] * this->independent_runs_ * (100 + normal_random())); /// TODO: Deciding to return inf for infeasible cases, or to return penaltt values.
-//      clog << "tournament size is larger than lambda with comma selection." << endl;
-//      continue;
-//    }
-//    
-//    if (integer_para[3] > integer_para[1] + integer_para[0] && category_para[3] == "TOURNAMENTPLUS" ) {
-//      ERTs.push_back(this->budgets[ti] * this->independent_runs_ * (100 + normal_random())); /// TODO: Deciding to return inf for infeasible cases, or to return penaltt values.
-//      clog << "tournament size is larger than mu + lambda with plus selection." << endl;
-//      continue;
-//    }
-//    
-//    if (continuous_para[0] > 0 && integer_para[0] < 2) {
-//      clog << "doing crossover with population size less than 2" << endl;
-//      continue;
-//    }
-//    
-//    this->hiting_target_ = targets[ti];
-//    this->set_evaluation_budget(budgets[ti]);
-//    this->run_N(integer_para,continuous_para,category_para);
-//    
-//    // Calculating ERT
-//    double AHT = 0;
-//    int s, r;
-//    double ERT;
-//    r = this->independent_runs_;
-//    s = this->hitting_time_.size();
-//    for (int i = 0; i != s; ++i) {
-//      AHT += this->hitting_time_[i];
-//    }
-//    
-//    if (s != 0) {
-//      AHT = AHT / s;
-//      ERT = (double)(r - s) / (double) s * (double) budgets[ti] + AHT;
-//    } else {
-//      ERT = (double) budgets[ti] * r * (100 + normal_random());
-//    }
-//    
-//    ERTs.push_back(ERT);
-//    ti++;
-//  }
-//  return ERTs;
-//}
-
+size_t GeneticAlgorithm::get_independent_runs() const {
+  return this->independent_runs_;
+}

@@ -1,9 +1,9 @@
 #include "geneticAlgorithm.h"
 
-class fastGA : public GeneticAlgorithm {
+class FastGA : public GeneticAlgorithm {
   
 public:
-  fastGA(int mu, int lambda) {
+  FastGA(int mu, int lambda) {
     this->set_mu(mu);
     this->set_lambda(lambda);
     this->set_crossover_mutation_r("IND");
