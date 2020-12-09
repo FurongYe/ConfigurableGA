@@ -48,7 +48,7 @@ public:
   ///
   /// Before acquiring a problem from the suite, this function must be invoked.
   /// Otherwise the list of problem is empty.
-  void loadProblem();
+  virtual void loadProblem();
 
   /// \fn std::shared_ptr<IOHprofiler_problem<InputType>> get_next_problem()
   /// \brief An interface of requesting problems in suite.
@@ -94,7 +94,16 @@ public:
 
   std::vector<int> IOHprofiler_suite_get_dimension() const;
 
+  bool IOHprofiler_get_load_problem_flag() const;
+  
+  bool IOHprofiler_get_get_problem_flag() const;
+
+  size_t IOHprofiler_get_size_of_problem_list() const;
+
+  size_t IOHprofiler_get_problem_list_index() const;
+
   std::string IOHprofiler_suite_get_suite_name() const;
+
 
   void IOHprofiler_set_suite_problem_id(const std::vector<int> &problem_id);
 
@@ -104,6 +113,14 @@ public:
 
   void IOHprofiler_set_suite_name(const std::string suite_name);
 
+  void IOHprofiler_set_load_problem_flag(const bool flag);
+  
+  void IOHprofiler_set_get_problem_flag(const bool flag);
+
+  void IOHprofiler_set_size_of_problem_list(const size_t size_of_problem_list);
+
+  void IOHprofiler_set_problem_list_index(const size_t problem_list_index);
+  
   void mapIDTOName(const int id, const std::string name);
 
 private:

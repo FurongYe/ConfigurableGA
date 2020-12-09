@@ -42,8 +42,8 @@ public:
   generation_(0),
   evluation_budget_(DEFAULT_EVALUATION_BUDGET_),
   generation_budget_(DEFAULT_GENERATION_BUDGET_),
-  optimum_(numeric_limits<double>::max()), /// < TODO: now we assume doing maximization.
-  optimum_found_flag_(false) {}
+  optimum_(numeric_limits<double>::max()) /// < TODO: now we assume doing maximization.
+  {}
   
   ~GeneticAlgorithm() {}
   GeneticAlgorithm(const GeneticAlgorithm&) = delete;
@@ -123,13 +123,14 @@ public:
   int get_dimension() const;
   double get_crossover_probability() const;
   int get_crossover_mutation_r() const;
-  vector< vector<int> > get_parents_population();
-  vector<double> get_parents_fitness();
-  vector< vector<int> >  get_offspring_population();
-  vector<double> get_offspring_fitness();
-  double get_best_found_fitness();
-  vector <int> get_best_individual();
-  size_t get_generation();
+  vector< vector<int> > get_parents_population() const;
+  vector<double> get_parents_fitness() const;
+  vector< vector<int> >  get_offspring_population() const;
+  vector<double> get_offspring_fitness() const;
+  double get_best_found_fitness() const;
+  vector <int> get_best_individual() const;
+  size_t get_generation() const;
+  size_t get_independent_runs() const;
   
   /// \fn SetAllParameters()
   /// \brief Set all parameters of the genetic algorithm.
@@ -225,8 +226,6 @@ private:
   size_t independent_runs_; /// < number of independent runs.
   
   double optimum_;
-  bool optimum_found_flag_; /// < a flag if the optimum is found.
-  int dimension_;
   
   vector<size_t> selected_parents_;
   

@@ -110,6 +110,23 @@ template <class InputType> std::vector<int> IOHprofiler_suite<InputType>::IOHpro
   return this->dimension;
 }
 
+template <class InputType> bool IOHprofiler_suite<InputType>::IOHprofiler_get_load_problem_flag() const {
+  return this->load_problem_flag; 
+}
+
+template <class InputType> bool IOHprofiler_suite<InputType>::IOHprofiler_get_get_problem_flag() const {
+  return this->get_problem_flag;
+}
+
+template <class InputType> size_t IOHprofiler_suite<InputType>::IOHprofiler_get_size_of_problem_list() const {
+  return this->size_of_problem_list;
+}
+
+template <class InputType> size_t IOHprofiler_suite<InputType>::IOHprofiler_get_problem_list_index() const {
+  return this->problem_list_index;
+}
+
+
 template <class InputType> std::string IOHprofiler_suite<InputType>::IOHprofiler_suite_get_suite_name() const {
   return this->suite_name;
 }
@@ -136,4 +153,20 @@ template <class InputType> void IOHprofiler_suite<InputType>::IOHprofiler_set_su
 template <class InputType> void IOHprofiler_suite<InputType>::mapIDTOName(const int id, const std::string name){
   problem_id_name_map[id] = name;
   problem_name_id_map[name] = id;
+}
+
+template <class InputType> void IOHprofiler_suite<InputType>::IOHprofiler_set_load_problem_flag(const bool flag) {
+  this->load_problem_flag = flag;
+}
+
+template <class InputType> void IOHprofiler_suite<InputType>::IOHprofiler_set_get_problem_flag(const bool flag) {
+  this->get_problem_flag = flag;
+}
+
+template <class InputType> void IOHprofiler_suite<InputType>::IOHprofiler_set_size_of_problem_list(const size_t size_of_problem_list) {
+  this->size_of_problem_list = size_of_problem_list;
+}
+
+template <class InputType> void IOHprofiler_suite<InputType>::IOHprofiler_set_problem_list_index(const size_t problem_list_index) {
+  this->problem_list_index = problem_list_index;
 }

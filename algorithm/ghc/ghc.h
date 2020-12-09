@@ -44,7 +44,7 @@ public:
 
   void run(shared_ptr<IOHprofiler_suite<int> > suite);
 
-  void run(string folder_path, string folder_name, shared_ptr<IOHprofiler_suite<int> > suite, int eval_budget, int gene_budget, int independent_runs, unsigned rand_seed);
+  void run(string folder_path, string folder_name, shared_ptr<IOHprofiler_suite<int> > suite, int eval_budget, int independent_runs, unsigned rand_seed);
   
   void SetSeed(unsigned seed);
   
@@ -53,7 +53,6 @@ public:
   void AssignLogger(shared_ptr<IOHprofiler_csv_logger<int> > logger_ptr);
   
   void set_evaluation_budget(const size_t evaluation_budget);
-  void set_generation_budget(const size_t generation_budget);
   void set_independent_runs(const size_t independent_runs);
   void set_parent(const vector< int > &parent);
   void set_parent_fitness(const double parents_fitness);
@@ -87,7 +86,6 @@ private:
   size_t evaluation_; /// < evaluation times
   size_t generation_; /// < number of iterations/generations
   size_t evluation_budget_; /// < budget for evaluations
-  size_t generation_budget_; /// < budget for generations
   
   size_t independent_runs_; /// < number of independent runs.
   

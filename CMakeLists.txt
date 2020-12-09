@@ -9,7 +9,7 @@ project(IOHexperimenter VERSION 1.0)
 SET(EXECUTABLE_OUTPUT_PATH "./")
 
 # add the executable
-add_executable(main ./main.cpp)
+add_executable(main run/main.cpp)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 14)
@@ -19,9 +19,33 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS "-g -std=c++11 -Wall -Wno-unused-variable -Wno-unused-function")
 
 # set source file directorys and prepare for adding libraries.
-SET(GA_SRC "src/")
+SET(GA_SRC "algorithm/ga/src/")
 FILE (GLOB GA_SRC_CPP "${GA_SRC}/*.cpp")
 FILE (GLOB GA_SRC_INCLUDE "${GA_SRC}/*.h")
+
+SET(GA_INS "algorithm/ga/instance/")
+FILE (GLOB GA_INS_CPP "${GA_INS}/*.cpp")
+FILE (GLOB GA_INS_INCLUDE "${GA_INS}/*.h")
+
+SET(EDA_SRC "algorithm/eda/")
+FILE (GLOB EDA_SRC_CPP "${EDA_SRC}/*.cpp")
+FILE (GLOB EDA_SRC_INCLUDE "${EDA_SRC}/*.h")
+
+SET(FEA_SRC "algorithm/fea/")
+FILE (GLOB FEA_SRC_CPP "${FEA_SRC}/*.cpp")
+FILE (GLOB FEA_SRC_INCLUDE "${FEA_SRC}/*.h")
+
+SET(GHC_SRC "algorithm/ghc/")
+FILE (GLOB GHC_SRC_CPP "${GHC_SRC}/*.cpp")
+FILE (GLOB GHC_SRC_INCLUDE "${GHC_SRC}/*.h")
+
+SET(RS_SRC "algorithm/rs/")
+FILE (GLOB RS_SRC_CPP "${RS_SRC}/*.cpp")
+FILE (GLOB RS_SRC_INCLUDE "${RS_SRC}/*.h")
+
+SET(SA_SRC "algorithm/sa/")
+FILE (GLOB SA_SRC_CPP "${SA_SRC}/*.cpp")
+FILE (GLOB SA_SRC_INCLUDE "${SA_SRC}/*.h")
 
 SET(PROBLEMS_BBOB_DIR "IOH/src/Problems/BBOB")
 FILE (GLOB PROBLEMS_BBOB_SRC "${PROBLEMS_BBOB_DIR}/*.hpp")
@@ -96,21 +120,43 @@ SET(IOHEXPERIMENTER_INCLUDE
   "${TEMPLATE_LOGGERS_INCLUDE}"
 )
 
-SET(GA_CPP
+SET(ALGORITHM_DIR
+  "${GA_SRC}"
+  "${GA_INS}"
+  "${SA_SRC}"
+  "${GHC_SRC}"
+  "${RS_SRC}"
+  "${FEA_INS}"
+  "${EDA_SRC}"
+)
+
+SET(ALGORITHM_CPP
   "${GA_SRC_CPP}"
+  "${GA_INS_CPP}"
+  "${SA_SRC_CPP}"
+  "${GHC_SRC_CPP}"
+  "${RS_SRC_CPP}"
+  "${FEA_SRC_CPP}"
+  "${EDA_SRC_CPP}"
 )
 
-SET(GA_INCLUDE
+SET(ALGORITHM_INCLUDE
   "${GA_SRC_INCLUDE}"
+  "${GA_INS_INCLUDE}"
+  "${SA_SRC_INCLUDE}"
+  "${GHC_SRC_INCLUDE}"
+  "${RS_SRC_INCLUDE}"
+  "${FEA_INS_INCLUDE}"
+  "${EDA_SRC_INCLUDE}"
 )
 
-include_directories(${GA_SRC} ${IOHEXPERIMENTER_DIR} )
+include_directories(${ALGORITHM_DIR} ${IOHEXPERIMENTER_DIR} )
 
 # add the IOH library
-add_library(configGA ${GA_CPP} ${IOHEXPERIMENTER_SRC})
+add_library(configGA ${ALGORITHM_CPP} ${IOHEXPERIMENTER_SRC})
 
 target_link_libraries(main configGA)
 
 # install. set name of the installed library as 'IOH'.
 install (TARGETS configGA DESTINATION lib)
-install (FILES ${GA_INCLUDE} ${IOHEXPERIMENTER_INCLUDE} DESTINATION include)
+install (FILES ${ALGORITHM_INCLUDE} ${IOHEXPERIMENTER_INCLUDE} DESTINATION include)
