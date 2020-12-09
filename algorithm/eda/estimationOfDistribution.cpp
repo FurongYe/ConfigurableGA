@@ -73,7 +73,7 @@ void EstimationOfDistribution::Selection() {
     this->parents_population_.clear();
     this->parents_fitness_.clear();
     this->parents_population_ = vector < vector <int> > (this->mu_, vector< int > (this->get_dimension(), 0) );
-    this->parents_fitness_ = vector <double > (this->get_dimension(), 0);
+    this->parents_fitness_ = vector <double > (this->mu_, 0);
   }
 
   vector< int > index(this->lambda_, 0);

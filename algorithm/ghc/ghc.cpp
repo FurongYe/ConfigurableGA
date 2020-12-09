@@ -3,7 +3,7 @@
 #include "geneticAlgorithm.h"
 
 bool GreedyHillClimber::Termination() {
-  if (!this->problem_->IOHprofiler_hit_optimal() && this->evaluation_ < this->evluation_budget_ && this->generation_ <= this->generation_budget_) {
+  if (!this->problem_->IOHprofiler_hit_optimal() && this->evaluation_ < this->evluation_budget_) {
     return false;
   } else {
     return true;
@@ -67,16 +67,13 @@ void GreedyHillClimber::set_evaluation_budget(const size_t evaluation_budget) {
   this->evluation_budget_ = evaluation_budget;
 }
 
-void GreedyHillClimber::set_generation_budget(const size_t generation_budget) {
-  this->generation_budget_ = generation_budget;
-}
 
 void GreedyHillClimber::set_independent_runs(const size_t independent_runs) {
   this->independent_runs_ = independent_runs;
 }
 
 void GreedyHillClimber::set_parent(const vector< int > &parent) {
-  this->parent_ = parent_;
+  this->parent_ = parent;
 }
 
 void GreedyHillClimber::set_parent_fitness(const double parent_fitness) {
@@ -191,7 +188,7 @@ void GreedyHillClimber::run(shared_ptr<IOHprofiler_suite<int> > suite) {
   }
 }
 
-void GreedyHillClimber::run(string folder_path, string folder_name, shared_ptr<IOHprofiler_suite<int> > suite, int eval_budget, int gene_budget, int independent_runs, unsigned rand_seed) {
+void GreedyHillClimber::run(string folder_path, string folder_name, shared_ptr<IOHprofiler_suite<int> > suite, int eval_budget, int independent_runs, unsigned rand_seed) {
   string algorithm_name = "gHC";
   std::shared_ptr<IOHprofiler_csv_logger<int>> logger(new IOHprofiler_csv_logger<int>(folder_path,folder_name,algorithm_name,algorithm_name) );
   logger->activate_logger();
@@ -199,7 +196,6 @@ void GreedyHillClimber::run(string folder_path, string folder_name, shared_ptr<I
     
 
   this->set_evaluation_budget(eval_budget);
-  this->set_generation_budget(gene_budget);
   this->set_independent_runs(independent_runs);
   this->SetSeed(rand_seed);
   
