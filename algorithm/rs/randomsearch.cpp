@@ -33,7 +33,7 @@ void RandomSearch::AssignLogger(shared_ptr<IOHprofiler_csv_logger<int> > logger_
   this->csv_logger_ = logger_ptr;
 }
 
-double RandomSearch::Evaluate(vector<int> &x) {ghc
+double RandomSearch::Evaluate(vector<int> &x) {
   double result;
   result = this->problem_->evaluate(x);
   if (this->csv_logger_ != nullptr) {
