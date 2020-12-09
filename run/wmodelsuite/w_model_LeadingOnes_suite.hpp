@@ -60,7 +60,7 @@ public:
     IOHprofiler_set_suite_problem_id(problem_id);
     IOHprofiler_set_suite_instance_id(instance_id);
     IOHprofiler_set_suite_dimension(dimension);
-    IOHprofiler_set_suite_name("W_Model_LeadingOnes_suite");
+    IOHprofiler_set_suite_name("W_Model_LeadingOnes");
     this->loadProblem();
   }
 
@@ -116,7 +116,7 @@ public:
     IOHprofiler_set_suite_problem_id(problem_id);
     IOHprofiler_set_suite_instance_id(instance_id);
     IOHprofiler_set_suite_dimension(dimension);
-    IOHprofiler_set_suite_name("W_Model_LeadingOnes_suite");
+    IOHprofiler_set_suite_name("W_Model_LeadingOnes");
     this->loadProblem();
   }
 
@@ -127,34 +127,42 @@ public:
     {
       this->clear();
     }
-    this->IOHprofiler_set_size_of_problem_list(this->para_product_.size() * this->IOHprofiler_suite_get_dimension().size());
+    this->IOHprofiler_set_size_of_problem_list(this->IOHprofiler_suite_get_number_of_problems() *
+                                               this->IOHprofiler_suite_get_number_of_instances() *
+                                               this->IOHprofiler_suite_get_number_of_dimensions());
 
-    for (int i = 0; i != this->para_product_.size(); ++i)
+    vector<int> p_id = this->IOHprofiler_suite_get_problem_id();
+    vector<int> i_id = this->IOHprofiler_suite_get_instance_id();
+    vector<int> d = this->IOHprofiler_suite_get_dimension();
+    for (int i = 0; i != p_id.size(); ++i)
     {
-      for (int j = 0; j != this->IOHprofiler_suite_get_dimension().size(); ++j)
+      for (int j = 0; j != d.size(); ++j)
       {
+        for (int h = 0; h != i_id.size(); ++h)
+        {
+          shared_ptr<W_Model_LeadingOnes> p(new W_Model_LeadingOnes());
+          p->set_w_setting(this->dummy_para_[this->para_product_[p_id[i] - 1][0]],
+                           this->epistasis_para_[this->para_product_[p_id[i] - 1][1]],
+                           this->neturality_para_[this->para_product_[p_id[i] - 1][2]],
+                           static_cast<int>(floor(this->IOHprofiler_suite_get_dimension()[j] * this->ruggedness_para_[this->para_product_[p_id[i] - 1][3]])));
 
-        shared_ptr<W_Model_LeadingOnes> p(new W_Model_LeadingOnes());
-        p->set_w_setting(this->dummy_para_[this->para_product_[i][0]],
-                         this->epistasis_para_[this->para_product_[i][1]],
-                         this->neturality_para_[this->para_product_[i][2]],
-                         static_cast<int>(floor(this->IOHprofiler_suite_get_dimension()[j] * this->ruggedness_para_[this->para_product_[i][3]])));
-
-        // Set the problem name.
-        string problem_name = "LeadingOnes";
-        std::stringstream dss;
-        dss << std::setprecision(3) << this->dummy_para_[this->para_product_[i][0]];
-        problem_name += "_D" + dss.str();
-        problem_name += "_E" + std::to_string(this->epistasis_para_[this->para_product_[i][1]]);
-        problem_name += "_N" + std::to_string(this->neturality_para_[this->para_product_[i][2]]);
-        std::stringstream rss;
-        rss << std::setprecision(3) << this->ruggedness_para_[this->para_product_[i][3]];
-        problem_name += "_R" + rss.str();
-        p->IOHprofiler_set_problem_name(problem_name);
-        p->IOHprofiler_set_problem_id(i + 1);
-        p->IOHprofiler_set_number_of_variables(this->IOHprofiler_suite_get_dimension()[j]);
-        this->push_back(p);
-        mapIDTOName(i + 1, problem_name);
+          // Set the problem name.
+          string problem_name = "LeadingOnes";
+          std::stringstream dss;
+          dss << std::setprecision(3) << this->dummy_para_[this->para_product_[p_id[i] - 1][0]];
+          problem_name += "_D" + dss.str();
+          problem_name += "_E" + std::to_string(this->epistasis_para_[this->para_product_[p_id[i] - 1][1]]);
+          problem_name += "_N" + std::to_string(this->neturality_para_[this->para_product_[p_id[i] - 1][2]]);
+          std::stringstream rss;
+          rss << std::setprecision(3) << this->ruggedness_para_[this->para_product_[p_id[i] - 1][3]];
+          problem_name += "_R" + rss.str();
+          p->IOHprofiler_set_problem_name(problem_name);
+          p->IOHprofiler_set_problem_id(p_id[i]);
+          p->IOHprofiler_set_number_of_variables(d[j]);
+          p->IOHprofiler_set_instance_id(i_id[h]);
+          this->push_back(p);
+          mapIDTOName(p_id[i], problem_name);
+        }
       }
     }
 
