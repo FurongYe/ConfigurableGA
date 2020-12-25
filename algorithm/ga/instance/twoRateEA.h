@@ -94,6 +94,8 @@ public:
           r = r * 2.0;
         }
       }
+      r = r < 2.0 ? 2.0 : r;
+      r = r > (this->get_dimension() / 4.0) ? (this->get_dimension() / 4.0) : r;
     }
   }
 
