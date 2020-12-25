@@ -107,7 +107,7 @@ void GeneticAlgorithm::DoGeneticAlgorithm() {
       
       if (this->c_flipped_index == this->m_flipped_index) { /// If the flipping indexes of crossover and mutation are identical, the individual remains the same.
         this->offspring_fitness_.push_back(this->parents_fitness_[this->selected_parents_[0]]);
-      } else if (this->offspring_population_[i] == this->parents_population_[this->selected_parents_[1]]) { /// If the offspring is identical with the second parent.
+      } else if (rand < this->crossover_probability_ && this->offspring_population_[i] == this->parents_population_[this->selected_parents_[1]]) { /// If the offspring is identical with the second parent.
         /// TODO: Do something to save time for this comparison.
         this->offspring_fitness_.push_back(this->parents_fitness_[this->selected_parents_[1]]);
       } else { /// otherwise evaluate.

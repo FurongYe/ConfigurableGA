@@ -56,7 +56,7 @@ void runAlgorithm(shared_ptr< IOHprofiler_suite<int> > suite, const string algor
     staticEA ea(1, 1, 1.5);
     ea.run(dir, algorithm_name, suite, budget, std::numeric_limits<int>::max(), runs, seed);
   } else if (algorithm_name == "llea") {
-    oneLambdaLambdaEA llEA(10);
+    oneLambdaLambdaEA llEA(1);
     llEA.run(dir, algorithm_name, suite, budget, std::numeric_limits<int>::max(), runs, seed);
   } else if (algorithm_name == "rls") {
     RLS rls;
@@ -74,7 +74,7 @@ void runAlgorithm(shared_ptr< IOHprofiler_suite<int> > suite, const string algor
     TwoRateEA twoRateGA(10);
     twoRateGA.run(dir, algorithm_name, suite, budget, std::numeric_limits<int>::max(), runs, seed);
   } else if (algorithm_name == "umda") {
-    EstimationOfDistribution umda(50,50);
+    EstimationOfDistribution umda(25,50);
     umda.run(dir, algorithm_name, suite, budget, std::numeric_limits<int>::max(), runs, seed);
   } else if (algorithm_name == "sa") {
     run_simulated_annealing_exp(dir, suite, budget, runs, seed);

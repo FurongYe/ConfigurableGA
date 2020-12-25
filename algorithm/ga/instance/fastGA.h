@@ -6,7 +6,7 @@ public:
   FastGA(int mu, int lambda) {
     this->set_mu(mu);
     this->set_lambda(lambda);
-    this->set_crossover_mutation_r("IND");
+    this->set_crossover_mutation_r("OR");
     this->set_crossover_probability(0);
     this->set_mutation_operator("POWERLAWSAMPLE");
     this->set_beta_f(1.5);

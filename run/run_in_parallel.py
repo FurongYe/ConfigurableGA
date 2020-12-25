@@ -9,7 +9,7 @@ size = comm.Get_size()
 ## settings for experiments
 # The settings of
 algorithm_name = [
-  "ea", "ea", "ea23", "llea",
+  "ea", "ea2", "ea23", "llea",
   "rls", "rs", "ghc", "fga",
   "2ratega", "umda", "sa", "sars", "fea"
 ]

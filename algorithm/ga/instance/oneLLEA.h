@@ -34,15 +34,16 @@ public:
     vector<int> mutation_offspring, best_ind, x;
     bool update_lambda_flag;
     int lambda,dimension;
+    double mutation_rate, p_u;
+    int mutation_strength;
     
     this->Preparation();
     
     lambda = this->get_lambda();
     dimension = this->get_dimension();
-    this->set_mutation_rate(static_cast<double>(lambda) / static_cast<double>(dimension));
-    this->set_p_u( 1.0/static_cast<double>(lambda) );
-    
+
     this->Initialization();
+    
     while (!this->Termination()) {
       
       this->update_generation();
@@ -51,18 +52,22 @@ public:
       this->clear_offspring_population();
       this->clear_offspring_fitness();
       
+      mutation_rate = static_cast<double>(lambda) / static_cast<double>(dimension);
+      this->set_p_u( 1.0/static_cast<double>(lambda) );
+      
       /**Mutation stage
        */
+      mutation_strength = this->SampleConditionalBinomial(mutation_rate,dimension);
       for (size_t i = 0; i < this->get_lambda(); ++i) {
         x = this->get_parents_population()[0];
         
-        this->DoMutation(x);
+        this->Flip(x,mutation_strength);
         this->add_offspring_fitness(this->Evaluate(x));
         
         if (this->get_offspring_fitness()[i] >= best_f) {
           best_ind = x;
+          best_f = this->get_offspring_fitness()[i];
           if (this->get_offspring_fitness()[i] > best_f) {
-            best_f = this->get_offspring_fitness()[i];
             update_lambda_flag = true;
           }
         }
@@ -80,7 +85,7 @@ public:
       for (size_t i = 0; i < this->get_lambda(); ++i) {
         
         this->DoCrossover(x, this->get_parents_population()[0], mutation_offspring);
-        if ( (this->c_flipped_index.size() == 0)) {
+        if (this->c_flipped_index.size() == 0) {
           this->set_offspring_fitness(this->get_parents_fitness()[0],i);
         }else if (x == mutation_offspring) {
           this->set_offspring_fitness(best_mutation_f,i);
@@ -90,8 +95,8 @@ public:
         
         if (this->get_offspring_fitness()[i] >= best_f) {
           best_ind = x;
+          best_f = this->get_offspring_fitness()[i];
           if (this->get_offspring_fitness()[i] > best_f) {
-            best_f = this->get_offspring_fitness()[i];
             update_lambda_flag = true;
           }
         }
