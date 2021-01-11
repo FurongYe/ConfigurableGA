@@ -66,6 +66,7 @@ template <class InputType> void IOHprofiler_problem<InputType>::calc_optimal() {
       }
     }
     customize_optimal();
+    transformation.objectives_transformation(this->best_variables,this->optimal,this->problem_id,this->instance_id,this->problem_type);
   }
 }
 
